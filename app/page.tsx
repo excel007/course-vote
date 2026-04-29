@@ -39,7 +39,7 @@ function YearSelect({ onSelect }: { onSelect: (y: number) => void }) {
             }}
           >
             <span className="text-3xl sm:text-4xl font-bold text-white">{y}</span>
-            <span className="text-white/70 text-[11px] sm:text-xs mt-1">ปีที่ {y}</span>
+            <span className="text-white/70 text-[11px] sm:text-xs mt-1">ปีที่ {y}{y === 4 ? '++' : ''}</span>
           </button>
         ))}
       </div>
