@@ -13,6 +13,68 @@ interface FormState {
 
 const EMPTY_FORM: FormState = { name: '', code: '', allowed_years: [1, 2, 3, 4] }
 
+function LoginForm({ onLogin }: { onLogin: (password: string) => Promise<boolean> }) {
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+    setError('')
+    const ok = await onLogin(password)
+    if (!ok) {
+      setError('รหัสผ่านไม่ถูกต้อง')
+    }
+    setSubmitting(false)
+  }
+
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-canvas">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <div className="text-4xl mb-3">🔒</div>
+          <h1 className="text-2xl font-bold text-ink">Admin</h1>
+          <p className="text-muted text-sm mt-1">กรุณาใส่รหัสผ่าน</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="รหัสผ่าน"
+              autoFocus
+              className="w-full px-4 py-3 rounded-sm text-sm text-ink placeholder-muted-soft outline-none focus:ring-2 focus:ring-ink"
+              style={{ border: '1px solid #dddddd' }}
+            />
+          </div>
+
+          {error && (
+            <p className="text-primary-error-text text-xs text-center">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={!password || submitting}
+            className="w-full py-3 rounded-sm text-sm font-semibold text-white transition-all disabled:opacity-40"
+            style={{ background: '#ff385c' }}
+          >
+            {submitting ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ'}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <Link href="/" className="text-muted hover:text-ink text-xs transition-colors">
+            ← กลับหน้าโหวต
+          </Link>
+        </div>
+      </div>
+    </main>
+  )
+}
+
 function Modal({
   title,
   onClose,
@@ -73,10 +135,7 @@ function CourseForm({
           onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
           placeholder="เช่น Introduction to Programming"
           className="w-full px-3 py-2.5 rounded-sm text-sm text-ink placeholder-muted-soft outline-none focus:ring-2 focus:ring-ink"
-          style={{
-            background: '#ffffff',
-            border: '1px solid #dddddd',
-          }}
+          style={{ border: '1px solid #dddddd' }}
         />
       </div>
 
@@ -88,10 +147,7 @@ function CourseForm({
           onChange={(e) => setForm((p) => ({ ...p, code: e.target.value }))}
           placeholder="เช่น CS101"
           className="w-full px-3 py-2.5 rounded-sm text-sm text-ink placeholder-muted-soft outline-none focus:ring-2 focus:ring-ink font-mono"
-          style={{
-            background: '#ffffff',
-            border: '1px solid #dddddd',
-          }}
+          style={{ border: '1px solid #dddddd' }}
         />
       </div>
 
@@ -111,11 +167,7 @@ function CourseForm({
                 style={
                   checked
                     ? { background: '#ff385c', color: '#ffffff', border: '2px solid #ff385c' }
-                    : {
-                        background: '#f7f7f7',
-                        color: '#6a6a6a',
-                        border: '2px solid #ebebeb',
-                      }
+                    : { background: '#f7f7f7', color: '#6a6a6a', border: '2px solid #ebebeb' }
                 }
               >
                 ปี {y}
@@ -159,9 +211,7 @@ function CourseRow({
   onDelete: () => void
 }) {
   return (
-    <div
-      className="flex items-center gap-3 px-4 py-3 rounded-md border border-hairline bg-canvas"
-    >
+    <div className="flex items-center gap-3 px-4 py-3 rounded-md border border-hairline bg-canvas">
       <div className="flex-1 min-w-0">
         {course.code && (
           <span className="text-[10px] font-mono text-muted block">{course.code}</span>
@@ -205,6 +255,8 @@ function CourseRow({
 }
 
 export default function AdminPage() {
+  const [authenticated, setAuthenticated] = useState(false)
+  const [checking, setChecking] = useState(true)
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -212,6 +264,32 @@ export default function AdminPage() {
   const [selected, setSelected] = useState<Course | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    fetch('/api/admin/verify')
+      .then((r) => r.json())
+      .then((data) => setAuthenticated(data.authenticated === true))
+      .catch(() => setAuthenticated(false))
+      .finally(() => setChecking(false))
+  }, [])
+
+  const handleLogin = async (password: string): Promise<boolean> => {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    })
+    if (res.ok) {
+      setAuthenticated(true)
+      return true
+    }
+    return false
+  }
+
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' })
+    setAuthenticated(false)
+  }
 
   const showToast = (msg: string) => {
     setToast(msg)
@@ -226,8 +304,8 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    fetchCourses()
-  }, [fetchCourses])
+    if (authenticated) fetchCourses()
+  }, [authenticated, fetchCourses])
 
   const closeModal = () => {
     setModal(null)
@@ -287,11 +365,21 @@ export default function AdminPage() {
       (c.code ?? '').toLowerCase().includes(search.toLowerCase()),
   )
 
+  if (checking) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-canvas">
+        <p className="text-muted text-sm">⏳ กำลังตรวจสอบ...</p>
+      </main>
+    )
+  }
+
+  if (!authenticated) {
+    return <LoginForm onLogin={handleLogin} />
+  }
+
   return (
     <main className="min-h-screen pb-16 bg-canvas">
-      <div
-        className="sticky top-0 z-20 border-b border-hairline bg-canvas"
-      >
+      <div className="sticky top-0 z-20 border-b border-hairline bg-canvas">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
             <h1 className="text-ink font-bold text-base">⚙️ Admin</h1>
@@ -304,6 +392,12 @@ export default function AdminPage() {
             <Link href="/dashboard" className="text-muted hover:text-ink text-xs transition-colors">
               Dashboard
             </Link>
+            <button
+              onClick={handleLogout}
+              className="text-xs text-muted hover:text-ink transition-colors"
+            >
+              ออก
+            </button>
           </div>
         </div>
       </div>
@@ -316,10 +410,7 @@ export default function AdminPage() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="🔍 ค้นหาวิชา..."
             className="flex-1 px-3 py-2.5 rounded-sm text-sm text-ink placeholder-muted-soft outline-none"
-            style={{
-              background: '#ffffff',
-              border: '1px solid #dddddd',
-            }}
+            style={{ border: '1px solid #dddddd' }}
           />
           <button
             onClick={() => setModal('add')}

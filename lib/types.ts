@@ -28,5 +28,6 @@ export interface Vote {
   course_id: string
   rating: Rating
   year: number
+  voter_id: string
   created_at: string
 }

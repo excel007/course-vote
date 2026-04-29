@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { Course, Rating, RATINGS, YEARS } from '@/lib/types'
+import { getVoterId } from '@/lib/voter'
 
 type VoteCounts = Record<string, Record<Rating, number>>
 
@@ -13,6 +14,8 @@ const YEAR_COLORS = [
   { from: '#e00b41', to: '#c13515' },
   { from: '#ff385c', to: '#92174d' },
 ]
+
+const THROTTLE_MS = 3000
 
 function YearSelect({ onSelect }: { onSelect: (y: number) => void }) {
   return (
@@ -61,17 +64,20 @@ function RatingButton({
   rating,
   isRecent,
   count,
+  disabled,
   onClick,
 }: {
   rating: typeof RATINGS[number]
   isRecent: boolean
   count: number
+  disabled: boolean
   onClick: () => void
 }) {
   return (
     <button
       onClick={onClick}
-      className={`rating-btn ${isRecent ? 'voted pulse-badge' : ''}`}
+      disabled={disabled}
+      className={`rating-btn ${isRecent ? 'voted pulse-badge' : ''} ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
       style={isRecent ? { borderColor: rating.hex, color: rating.hex } : { color: rating.hex }}
       title={rating.desc}
     >
@@ -90,11 +96,13 @@ function CourseCard({
   course,
   recentVoteRating,
   voteCounts,
+  throttled,
   onVote,
 }: {
   course: Course
   recentVoteRating: Rating | null
   voteCounts: Record<Rating, number>
+  throttled: boolean
   onVote: (rating: Rating) => void
 }) {
   return (
@@ -124,6 +132,7 @@ function CourseCard({
             rating={r}
             isRecent={recentVoteRating === r.label}
             count={voteCounts[r.label] ?? 0}
+            disabled={throttled}
             onClick={() => onVote(r.label)}
           />
         ))}
@@ -140,17 +149,21 @@ export default function VotePage() {
   const [recentVotes, setRecentVotes] = useState<Record<string, Rating>>({})
   const [toast, setToast] = useState<{ msg: string; hex: string } | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [lastVoteTime, setLastVoteTime] = useState(0)
 
   const fetchData = useCallback(async () => {
+    const voterId = getVoterId()
     const [cRes, vRes] = await Promise.all([
       supabase.from('courses').select('*').order('name'),
-      supabase.from('votes').select('course_id, rating'),
+      supabase.from('votes').select('course_id, rating, voter_id'),
     ])
 
     if (cRes.data) setCourses(cRes.data)
 
     if (vRes.data) {
       const counts: VoteCounts = {}
+      const myVotes: Record<string, Rating> = {}
+
       vRes.data.forEach((v) => {
         if (!counts[v.course_id]) {
           counts[v.course_id] = {} as Record<Rating, number>
@@ -158,8 +171,14 @@ export default function VotePage() {
         }
         counts[v.course_id][v.rating as Rating] =
           (counts[v.course_id][v.rating as Rating] ?? 0) + 1
+
+        if (voterId && v.voter_id === voterId) {
+          myVotes[v.course_id] = v.rating as Rating
+        }
       })
+
       setVoteCounts(counts)
+      setRecentVotes(myVotes)
     }
   }, [])
 
@@ -174,39 +193,55 @@ export default function VotePage() {
 
   const handleVote = async (course: Course, rating: Rating) => {
     if (!year || submitting) return
+
+    const now = Date.now()
+    if (now - lastVoteTime < THROTTLE_MS) return
+
     setSubmitting(true)
 
-    const { error } = await supabase.from('votes').insert({
-      course_id: course.id,
-      rating,
-      year,
-    })
+    const voterId = getVoterId()
+    const prevRating = recentVotes[course.id]
+
+    const { error } = await supabase.from('votes').upsert(
+      {
+        course_id: course.id,
+        rating,
+        year,
+        voter_id: voterId,
+      },
+      { onConflict: 'voter_id,course_id' },
+    )
 
     if (!error) {
       setRecentVotes((p) => ({ ...p, [course.id]: rating }))
-      setVoteCounts((p) => ({
-        ...p,
-        [course.id]: {
-          ...(p[course.id] ?? {}),
-          [rating]: (p[course.id]?.[rating] ?? 0) + 1,
-        },
-      }))
+      setVoteCounts((p) => {
+        const updated = { ...p }
+        const courseCounts = { ...(updated[course.id] ?? {}) }
+
+        if (prevRating && prevRating !== rating) {
+          courseCounts[prevRating] = Math.max(0, (courseCounts[prevRating] ?? 0) - 1)
+        }
+        if (prevRating !== rating) {
+          courseCounts[rating] = (courseCounts[rating] ?? 0) + 1
+        }
+
+        updated[course.id] = courseCounts
+        return updated
+      })
 
       const r = RATINGS.find((x) => x.label === rating)!
       setToast({ msg: `${r.emoji} "${course.name}" → ${rating}`, hex: r.hex })
+      setLastVoteTime(now)
 
       setTimeout(() => {
         setToast(null)
-        setRecentVotes((p) => {
-          const n = { ...p }
-          delete n[course.id]
-          return n
-        })
       }, 2000)
     }
 
     setSubmitting(false)
   }
+
+  const throttled = submitting || (Date.now() - lastVoteTime < THROTTLE_MS)
 
   const visibleCourses = year
     ? courses.filter((c) => c.allowed_years?.includes(year))
@@ -266,6 +301,7 @@ export default function VotePage() {
               course={course}
               recentVoteRating={recentVotes[course.id] ?? null}
               voteCounts={voteCounts[course.id] ?? ({} as Record<Rating, number>)}
+              throttled={throttled}
               onVote={(rating) => handleVote(course, rating)}
             />
           ))
