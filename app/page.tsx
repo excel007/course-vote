@@ -15,7 +15,6 @@ const YEAR_COLORS = [
   { from: '#ff385c', to: '#92174d' },
 ]
 
-const THROTTLE_MS = 3000
 
 function YearSelect({ onSelect }: { onSelect: (y: number) => void }) {
   return (
@@ -96,13 +95,13 @@ function CourseCard({
   course,
   recentVoteRating,
   voteCounts,
-  throttled,
+  disabled,
   onVote,
 }: {
   course: Course
   recentVoteRating: Rating | null
   voteCounts: Record<Rating, number>
-  throttled: boolean
+  disabled: boolean
   onVote: (rating: Rating) => void
 }) {
   return (
@@ -132,7 +131,7 @@ function CourseCard({
             rating={r}
             isRecent={recentVoteRating === r.label}
             count={voteCounts[r.label] ?? 0}
-            disabled={throttled}
+            disabled={disabled}
             onClick={() => onVote(r.label)}
           />
         ))}
@@ -149,7 +148,6 @@ export default function VotePage() {
   const [recentVotes, setRecentVotes] = useState<Record<string, Rating>>({})
   const [toast, setToast] = useState<{ msg: string; hex: string } | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [lastVoteTime, setLastVoteTime] = useState(0)
 
   const fetchData = useCallback(async () => {
     const voterId = getVoterId()
@@ -194,9 +192,6 @@ export default function VotePage() {
   const handleVote = async (course: Course, rating: Rating) => {
     if (!year || submitting) return
 
-    const now = Date.now()
-    if (now - lastVoteTime < THROTTLE_MS) return
-
     setSubmitting(true)
 
     const voterId = getVoterId()
@@ -231,7 +226,6 @@ export default function VotePage() {
 
       const r = RATINGS.find((x) => x.label === rating)!
       setToast({ msg: `${r.emoji} "${course.name}" → ${rating}`, hex: r.hex })
-      setLastVoteTime(now)
 
       setTimeout(() => {
         setToast(null)
@@ -240,8 +234,6 @@ export default function VotePage() {
 
     setSubmitting(false)
   }
-
-  const throttled = submitting || (Date.now() - lastVoteTime < THROTTLE_MS)
 
   const visibleCourses = year
     ? courses.filter((c) => c.allowed_years?.includes(year))
@@ -301,7 +293,7 @@ export default function VotePage() {
               course={course}
               recentVoteRating={recentVotes[course.id] ?? null}
               voteCounts={voteCounts[course.id] ?? ({} as Record<Rating, number>)}
-              throttled={throttled}
+              disabled={submitting}
               onVote={(rating) => handleVote(course, rating)}
             />
           ))
