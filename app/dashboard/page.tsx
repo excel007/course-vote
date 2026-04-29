@@ -35,11 +35,11 @@ function StatBar({
 }) {
   const p = pct(stat.count, max)
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 sm:gap-3">
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline justify-between mb-1">
-          <span className="text-sm text-ink font-medium truncate">{stat.course.name}</span>
-          <span className="text-xs ml-2 flex-shrink-0" style={{ color: hex }}>
+          <span className="text-xs sm:text-sm text-ink font-medium truncate">{stat.course.name}</span>
+          <span className="text-[11px] sm:text-xs ml-2 flex-shrink-0" style={{ color: hex }}>
             {stat.count} โหวต
           </span>
         </div>
@@ -70,19 +70,17 @@ function CategorySection({
   const max = maxCount(top)
 
   return (
-    <div
-      className="rounded-md p-4 border border-hairline bg-canvas"
-    >
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-2xl">{rating.emoji}</span>
-        <div>
-          <h3 className="text-ink font-bold text-base leading-tight">{rating.label}</h3>
-          <p className="text-xs" style={{ color: `${rating.hex}99` }}>
+    <div className="rounded-md p-3 sm:p-4 border border-hairline bg-canvas">
+      <div className="flex items-start sm:items-center gap-2 mb-3 sm:mb-4">
+        <span className="text-xl sm:text-2xl">{rating.emoji}</span>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-ink font-bold text-sm sm:text-base leading-tight">{rating.label}</h3>
+          <p className="text-[11px] sm:text-xs" style={{ color: `${rating.hex}99` }}>
             {rating.desc}
           </p>
         </div>
         <div
-          className="ml-auto text-xs px-2.5 py-1 rounded-full font-semibold"
+          className="text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
           style={{ background: `${rating.hex}15`, color: rating.hex }}
         >
           {stats.reduce((a, s) => a + s.count, 0)} ทั้งหมด
@@ -90,15 +88,15 @@ function CategorySection({
       </div>
 
       {top.length === 0 ? (
-        <p className="text-muted text-sm text-center py-4">
+        <p className="text-muted text-xs sm:text-sm text-center py-3 sm:py-4">
           {filterYear ? `ยังไม่มีการโหวตจากปีที่ ${filterYear}` : 'ยังไม่มีการโหวต'}
         </p>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {top.map((stat, i) => (
-            <div key={stat.course.id} className="flex items-start gap-2">
+            <div key={stat.course.id} className="flex items-start gap-1.5 sm:gap-2">
               <span
-                className="text-xs font-bold w-5 flex-shrink-0 mt-0.5"
+                className="text-[11px] sm:text-xs font-bold w-4 sm:w-5 flex-shrink-0 mt-0.5"
                 style={{ color: i === 0 ? rating.hex : '#6a6a6a' }}
               >
                 #{i + 1}
@@ -159,16 +157,14 @@ export default function DashboardPage() {
     : votes.length
 
   return (
-    <main className="min-h-screen pb-16 bg-canvas">
-      <div
-        className="sticky top-0 z-20 border-b border-hairline bg-canvas"
-      >
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+    <main className="min-h-screen pb-12 sm:pb-16 bg-canvas">
+      <div className="sticky top-0 z-20 border-b border-hairline bg-canvas">
+        <div className="max-w-3xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-ink font-bold text-base">📊 Dashboard</h1>
-            <p className="text-muted text-xs mt-0.5">{totalVotes.toLocaleString()} โหวตทั้งหมด</p>
+            <h1 className="text-ink font-bold text-sm sm:text-base">📊 Dashboard</h1>
+            <p className="text-muted text-[11px] sm:text-xs mt-0.5">{totalVotes.toLocaleString()} โหวตทั้งหมด</p>
           </div>
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-2 sm:gap-3 items-center flex-shrink-0">
             <button
               onClick={fetchData}
               className="text-muted hover:text-ink text-xs transition-colors"
@@ -176,21 +172,21 @@ export default function DashboardPage() {
             >
               🔄
             </button>
-            <Link href="/" className="text-muted hover:text-ink text-xs transition-colors">
+            <Link href="/" className="text-muted hover:text-ink text-[11px] sm:text-xs transition-colors">
               โหวต
             </Link>
-            <Link href="/admin" className="text-muted hover:text-ink text-xs transition-colors">
+            <Link href="/admin" className="text-muted hover:text-ink text-[11px] sm:text-xs transition-colors">
               Admin
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 pt-4 pb-2">
-        <div className="flex gap-2 flex-wrap">
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 pt-3 sm:pt-4 pb-1.5 sm:pb-2">
+        <div className="flex gap-1.5 sm:gap-2 flex-wrap">
           <button
             onClick={() => setFilterYear(null)}
-            className="px-4 py-1.5 rounded-full text-sm font-medium transition-all"
+            className="px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all"
             style={
               filterYear === null
                 ? { background: '#ff385c', color: '#ffffff' }
@@ -205,16 +201,16 @@ export default function DashboardPage() {
               <button
                 key={y}
                 onClick={() => setFilterYear(y)}
-                className="px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5"
+                className="px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5"
                 style={
                   filterYear === y
                     ? { background: '#ff385c', color: '#ffffff' }
                     : { background: '#f7f7f7', color: '#6a6a6a' }
                 }
               >
-                ปีที่ {y}
+                ปี {y}
                 <span
-                  className="text-[10px] px-1.5 py-0.5 rounded-full"
+                  className="text-[10px] px-1 sm:px-1.5 py-0.5 rounded-full"
                   style={{
                     background: filterYear === y ? 'rgba(255,255,255,0.25)' : '#ebebeb',
                   }}
@@ -227,11 +223,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 mt-4">
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 mt-3 sm:mt-4">
         {loading ? (
-          <div className="text-center py-20 text-muted text-sm">⏳ กำลังโหลด...</div>
+          <div className="text-center py-16 sm:py-20 text-muted text-sm">⏳ กำลังโหลด...</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {RATINGS.map((r) => (
               <CategorySection
                 key={r.label}

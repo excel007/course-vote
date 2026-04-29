@@ -15,43 +15,42 @@ const YEAR_COLORS = [
   { from: '#ff385c', to: '#92174d' },
 ]
 
-
 function YearSelect({ onSelect }: { onSelect: (y: number) => void }) {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-canvas">
-      <div className="text-center mb-10 slide-up">
-        <div className="text-5xl mb-3">📚</div>
-        <h1 className="text-4xl font-bold text-ink tracking-tight">วิชาโปรด</h1>
-        <p className="text-muted mt-2 text-base">โหวตบอกว่าวิชาไหน เป็นแบบไหน</p>
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:p-6 bg-canvas">
+      <div className="text-center mb-8 sm:mb-10 slide-up">
+        <div className="text-4xl sm:text-5xl mb-3">📚</div>
+        <h1 className="text-3xl sm:text-4xl font-bold text-ink tracking-tight">วิชาโปรด</h1>
+        <p className="text-muted mt-2 text-sm sm:text-base">โหวตบอกว่าวิชาไหน เป็นแบบไหน</p>
       </div>
 
-      <p className="text-muted text-sm mb-5">กรุณาเลือกชั้นปีของคุณก่อน</p>
+      <p className="text-muted text-xs sm:text-sm mb-4 sm:mb-5">กรุณาเลือกชั้นปีของคุณก่อน</p>
 
-      <div className="grid grid-cols-2 gap-4 w-full max-w-xs slide-up">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full max-w-[280px] sm:max-w-xs slide-up">
         {YEARS.map((y, i) => (
           <button
             key={y}
             onClick={() => onSelect(y)}
             className="aspect-square rounded-md flex flex-col items-center justify-center
-              transition-all duration-200 hover:scale-105 active:scale-95"
+              transition-all duration-200 active:scale-95 sm:hover:scale-105"
             style={{
               background: `linear-gradient(135deg, ${YEAR_COLORS[i].from}, ${YEAR_COLORS[i].to})`,
               color: '#ffffff',
             }}
           >
-            <span className="text-4xl font-bold text-white">{y}</span>
-            <span className="text-white/70 text-xs mt-1">ปีที่ {y}</span>
+            <span className="text-3xl sm:text-4xl font-bold text-white">{y}</span>
+            <span className="text-white/70 text-[11px] sm:text-xs mt-1">ปีที่ {y}</span>
           </button>
         ))}
       </div>
 
-      <div className="mt-12 flex gap-6">
+      <div className="mt-8 sm:mt-12 flex gap-6">
         <Link href="/dashboard"
-          className="text-muted hover:text-ink transition-colors text-sm flex items-center gap-1.5">
-          📊 ดู Dashboard
+          className="text-muted hover:text-ink transition-colors text-xs sm:text-sm flex items-center gap-1.5">
+          📊 Dashboard
         </Link>
         <Link href="/admin"
-          className="text-muted hover:text-ink transition-colors text-sm flex items-center gap-1.5">
+          className="text-muted hover:text-ink transition-colors text-xs sm:text-sm flex items-center gap-1.5">
           ⚙️ Admin
         </Link>
       </div>
@@ -80,11 +79,11 @@ function RatingButton({
       style={isRecent ? { borderColor: rating.hex, color: rating.hex } : { color: rating.hex }}
       title={rating.desc}
     >
-      <span className="text-xl leading-none">{rating.emoji}</span>
-      <span className="text-[10px] font-semibold leading-tight text-center" style={{ color: rating.hex }}>
+      <span className="text-lg sm:text-xl leading-none">{rating.emoji}</span>
+      <span className="text-[9px] sm:text-[10px] font-semibold leading-tight text-center truncate w-full px-0.5" style={{ color: rating.hex }}>
         {rating.label}
       </span>
-      <span className="text-[10px] text-muted leading-none">
+      <span className="text-[9px] sm:text-[10px] text-muted leading-none">
         {count > 0 ? count : ''}
       </span>
     </button>
@@ -106,17 +105,17 @@ function CourseCard({
 }) {
   return (
     <div className="course-card slide-up">
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <div>
+      <div className="mb-2.5 sm:mb-3 flex items-start justify-between gap-2">
+        <div className="min-w-0">
           {course.code && (
-            <span className="text-xs font-mono text-muted">{course.code}</span>
+            <span className="text-[10px] sm:text-xs font-mono text-muted">{course.code}</span>
           )}
           <h3 className="text-ink font-semibold text-sm leading-snug">{course.name}</h3>
         </div>
-        <div className="flex gap-1 flex-shrink-0">
+        <div className="flex gap-0.5 sm:gap-1 flex-shrink-0">
           {course.allowed_years.map(y => (
             <span key={y}
-              className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+              className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded-full font-medium"
               style={{ background: '#fff1f3', color: '#ff385c' }}>
               ปี{y}
             </span>
@@ -124,7 +123,7 @@ function CourseCard({
         </div>
       </div>
 
-      <div className="flex gap-1.5">
+      <div className="flex gap-1 sm:gap-1.5">
         {RATINGS.map(r => (
           <RatingButton
             key={r.label}
@@ -242,46 +241,44 @@ export default function VotePage() {
   if (step === 'year') return <YearSelect onSelect={selectYear} />
 
   return (
-    <main className="min-h-screen pb-24 bg-canvas">
-      <div
-        className="sticky top-0 z-20 border-b border-hairline bg-canvas"
-      >
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div>
-            <p className="text-ink font-bold text-base leading-tight">📚 วิชาโปรด</p>
-            <p className="text-primary text-xs mt-0.5">กำลังโหวตในฐานะ นักศึกษาปีที่ {year}</p>
+    <main className="min-h-screen pb-20 sm:pb-24 bg-canvas">
+      <div className="sticky top-0 z-20 border-b border-hairline bg-canvas">
+        <div className="max-w-2xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
+          <div className="min-w-0">
+            <p className="text-ink font-bold text-sm sm:text-base leading-tight truncate">📚 วิชาโปรด</p>
+            <p className="text-primary text-[11px] sm:text-xs mt-0.5">กำลังโหวตในฐานะ นักศึกษาปีที่ {year}</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
             <button
               onClick={() => setStep('year')}
-              className="text-xs text-muted hover:text-ink transition-colors">
+              className="text-[11px] sm:text-xs text-muted hover:text-ink transition-colors">
               เปลี่ยนปี
             </button>
             <Link href="/dashboard"
-              className="text-xs text-muted hover:text-ink transition-colors">
+              className="text-[11px] sm:text-xs text-muted hover:text-ink transition-colors">
               Dashboard
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 pt-4 pb-2">
-        <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 pt-3 sm:pt-4 pb-1.5 sm:pb-2">
+        <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-1 px-1">
           {RATINGS.map((r) => (
             <div
               key={r.label}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium whitespace-nowrap flex-shrink-0"
               style={{ border: `1px solid ${r.hex}55`, color: r.hex, background: `${r.hex}08` }}>
               {r.emoji} {r.label}
-              <span style={{ color: `${r.hex}88` }} className="text-[10px]">— {r.desc}</span>
+              <span style={{ color: `${r.hex}88` }} className="hidden sm:inline text-[10px]">— {r.desc}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 mt-3 space-y-3">
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 mt-2 sm:mt-3 space-y-2.5 sm:space-y-3">
         {visibleCourses.length === 0 ? (
-          <div className="text-center py-20 text-muted text-sm">
+          <div className="text-center py-16 sm:py-20 text-muted text-sm">
             <div className="text-3xl mb-3">🤔</div>
             ไม่มีรายวิชาสำหรับปีที่ {year}<br />
             ให้ Admin เพิ่มวิชาและตั้งค่าชั้นปีก่อนนะ
@@ -302,13 +299,13 @@ export default function VotePage() {
 
       {toast && (
         <div
-          className="fixed bottom-8 left-1/2 toast-anim px-5 py-2.5 rounded-full text-sm font-semibold shadow-2xl"
+          className="fixed bottom-4 sm:bottom-8 left-1/2 toast-anim px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold shadow-2xl max-w-[calc(100vw-2rem)]"
           style={{
             transform: 'translateX(-50%)',
             background: toast.hex,
             color: '#ffffff',
           }}>
-          {toast.msg}
+          <span className="truncate block max-w-[280px]">{toast.msg}</span>
         </div>
       )}
     </main>

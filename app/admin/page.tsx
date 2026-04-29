@@ -30,15 +30,15 @@ function LoginForm({ onLogin }: { onLogin: (password: string) => Promise<boolean
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-canvas">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-canvas">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <div className="text-4xl mb-3">🔒</div>
-          <h1 className="text-2xl font-bold text-ink">Admin</h1>
-          <p className="text-muted text-sm mt-1">กรุณาใส่รหัสผ่าน</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-ink">Admin</h1>
+          <p className="text-muted text-xs sm:text-sm mt-1">กรุณาใส่รหัสผ่าน</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
             <input
               type="password"
@@ -46,7 +46,7 @@ function LoginForm({ onLogin }: { onLogin: (password: string) => Promise<boolean
               onChange={(e) => setPassword(e.target.value)}
               placeholder="รหัสผ่าน"
               autoFocus
-              className="w-full px-4 py-3 rounded-sm text-sm text-ink placeholder-muted-soft outline-none focus:ring-2 focus:ring-ink"
+              className="w-full px-3 sm:px-4 py-3 rounded-sm text-sm text-ink placeholder-muted-soft outline-none focus:ring-2 focus:ring-ink"
               style={{ border: '1px solid #dddddd' }}
             />
           </div>
@@ -65,7 +65,7 @@ function LoginForm({ onLogin }: { onLogin: (password: string) => Promise<boolean
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-5 sm:mt-6 text-center">
           <Link href="/" className="text-muted hover:text-ink text-xs transition-colors">
             ← กลับหน้าโหวต
           </Link>
@@ -86,15 +86,18 @@ function Modal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
       style={{ background: 'rgba(0,0,0,0.5)' }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-md p-6 border border-hairline bg-canvas"
+        className="w-full sm:max-w-md rounded-t-md sm:rounded-md p-4 sm:p-6 border-t sm:border border-hairline bg-canvas max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-ink font-bold text-lg mb-5">{title}</h2>
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
+          <h2 className="text-ink font-bold text-base sm:text-lg">{title}</h2>
+          <button onClick={onClose} className="text-muted hover:text-ink text-lg leading-none p-1">✕</button>
+        </div>
         {children}
       </div>
     </div>
@@ -126,7 +129,7 @@ function CourseForm({
   const canSave = form.name.trim() !== '' && form.allowed_years.length > 0
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <div>
         <label className="text-xs text-muted block mb-1.5">ชื่อวิชา *</label>
         <input
@@ -211,44 +214,46 @@ function CourseRow({
   onDelete: () => void
 }) {
   return (
-    <div className="flex items-center gap-3 px-4 py-3 rounded-md border border-hairline bg-canvas">
-      <div className="flex-1 min-w-0">
-        {course.code && (
-          <span className="text-[10px] font-mono text-muted block">{course.code}</span>
-        )}
-        <p className="text-ink text-sm font-medium leading-snug truncate">{course.name}</p>
-        <div className="flex gap-1 mt-1">
-          {YEARS.map((y) => (
-            <span
-              key={y}
-              className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
-              style={
-                course.allowed_years?.includes(y)
-                  ? { background: '#fff1f3', color: '#ff385c' }
-                  : { background: '#f7f7f7', color: '#c1c1c1' }
-              }
-            >
-              ปี{y}
-            </span>
-          ))}
+    <div className="px-3 sm:px-4 py-3 rounded-md border border-hairline bg-canvas">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          {course.code && (
+            <span className="text-[10px] font-mono text-muted block">{course.code}</span>
+          )}
+          <p className="text-ink text-sm font-medium leading-snug truncate">{course.name}</p>
+          <div className="flex gap-0.5 sm:gap-1 mt-1">
+            {YEARS.map((y) => (
+              <span
+                key={y}
+                className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded-full font-medium"
+                style={
+                  course.allowed_years?.includes(y)
+                    ? { background: '#fff1f3', color: '#ff385c' }
+                    : { background: '#f7f7f7', color: '#c1c1c1' }
+                }
+              >
+                ปี{y}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="flex gap-1.5 flex-shrink-0">
-        <button
-          onClick={onEdit}
-          className="px-3 py-1.5 rounded-sm text-xs text-muted hover:text-ink transition-all"
-          style={{ background: '#f7f7f7' }}
-        >
-          แก้ไข
-        </button>
-        <button
-          onClick={onDelete}
-          className="px-3 py-1.5 rounded-sm text-xs text-primary-error-text hover:text-primary-error-text-hover transition-all"
-          style={{ background: '#fff5f5' }}
-        >
-          ลบ
-        </button>
+        <div className="flex gap-1.5 flex-shrink-0">
+          <button
+            onClick={onEdit}
+            className="px-2.5 sm:px-3 py-1.5 rounded-sm text-[11px] sm:text-xs text-muted hover:text-ink transition-all"
+            style={{ background: '#f7f7f7' }}
+          >
+            แก้ไข
+          </button>
+          <button
+            onClick={onDelete}
+            className="px-2.5 sm:px-3 py-1.5 rounded-sm text-[11px] sm:text-xs text-primary-error-text hover:text-primary-error-text-hover transition-all"
+            style={{ background: '#fff5f5' }}
+          >
+            ลบ
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -378,23 +383,23 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen pb-16 bg-canvas">
+    <main className="min-h-screen pb-12 sm:pb-16 bg-canvas">
       <div className="sticky top-0 z-20 border-b border-hairline bg-canvas">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-2xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-ink font-bold text-base">⚙️ Admin</h1>
-            <p className="text-muted text-xs mt-0.5">{courses.length} รายวิชา</p>
+            <h1 className="text-ink font-bold text-sm sm:text-base">⚙️ Admin</h1>
+            <p className="text-muted text-[11px] sm:text-xs mt-0.5">{courses.length} รายวิชา</p>
           </div>
-          <div className="flex gap-3 items-center">
-            <Link href="/" className="text-muted hover:text-ink text-xs transition-colors">
+          <div className="flex gap-2 sm:gap-3 items-center flex-shrink-0">
+            <Link href="/" className="text-muted hover:text-ink text-[11px] sm:text-xs transition-colors">
               โหวต
             </Link>
-            <Link href="/dashboard" className="text-muted hover:text-ink text-xs transition-colors">
+            <Link href="/dashboard" className="text-muted hover:text-ink text-[11px] sm:text-xs transition-colors">
               Dashboard
             </Link>
             <button
               onClick={handleLogout}
-              className="text-xs text-muted hover:text-ink transition-colors"
+              className="text-[11px] sm:text-xs text-muted hover:text-ink transition-colors"
             >
               ออก
             </button>
@@ -402,37 +407,37 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 mt-4 space-y-3">
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 mt-3 sm:mt-4 space-y-2.5 sm:space-y-3">
         <div className="flex gap-2">
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="🔍 ค้นหาวิชา..."
-            className="flex-1 px-3 py-2.5 rounded-sm text-sm text-ink placeholder-muted-soft outline-none"
+            className="flex-1 min-w-0 px-3 py-2.5 rounded-sm text-sm text-ink placeholder-muted-soft outline-none"
             style={{ border: '1px solid #dddddd' }}
           />
           <button
             onClick={() => setModal('add')}
-            className="px-4 py-2.5 rounded-sm text-sm font-semibold text-white flex-shrink-0 transition-all active:scale-95"
+            className="px-3 sm:px-4 py-2.5 rounded-sm text-xs sm:text-sm font-semibold text-white flex-shrink-0 transition-all active:scale-95"
             style={{ background: '#ff385c' }}
           >
-            + เพิ่มวิชา
+            + เพิ่ม
           </button>
         </div>
 
         <div
-          className="text-xs px-3 py-2 rounded-sm"
+          className="text-[11px] sm:text-xs px-3 py-2 rounded-sm"
           style={{ background: '#fff1f3', color: '#ff385c' }}
         >
           💡 กำหนดชั้นปีที่โหวตได้ต่อวิชาได้เลย — นักศึกษาจะเห็นเฉพาะวิชาที่ปีของตนเองโหวตได้
         </div>
 
         {loading ? (
-          <div className="text-center py-16 text-muted text-sm">⏳ กำลังโหลด...</div>
+          <div className="text-center py-12 sm:py-16 text-muted text-sm">⏳ กำลังโหลด...</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 text-muted text-sm">
-            {search ? 'ไม่พบวิชาที่ค้นหา' : 'ยังไม่มีรายวิชา กด "+ เพิ่มวิชา" ได้เลย'}
+          <div className="text-center py-12 sm:py-16 text-muted text-sm">
+            {search ? 'ไม่พบวิชาที่ค้นหา' : 'ยังไม่มีรายวิชา กด "+ เพิ่ม" ได้เลย'}
           </div>
         ) : (
           <div className="space-y-2">
@@ -485,7 +490,7 @@ export default function AdminPage() {
           <p className="text-body text-sm mb-1">
             คุณต้องการลบวิชา <span className="text-ink font-semibold">"{selected.name}"</span> ใช่ไหม?
           </p>
-          <p className="text-primary-error-text text-xs mb-6">⚠️ โหวตทั้งหมดของวิชานี้จะถูกลบด้วย</p>
+          <p className="text-primary-error-text text-xs mb-5 sm:mb-6">⚠️ โหวตทั้งหมดของวิชานี้จะถูกลบด้วย</p>
           <div className="flex gap-2">
             <button
               onClick={closeModal}
@@ -508,7 +513,7 @@ export default function AdminPage() {
 
       {toast && (
         <div
-          className="fixed bottom-8 left-1/2 toast-anim px-5 py-2.5 rounded-full text-sm font-semibold shadow-2xl text-white"
+          className="fixed bottom-4 sm:bottom-8 left-1/2 toast-anim px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold shadow-2xl text-white max-w-[calc(100vw-2rem)]"
           style={{ transform: 'translateX(-50%)', background: '#ff385c' }}
         >
           {toast}
