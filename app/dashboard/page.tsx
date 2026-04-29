@@ -16,7 +16,6 @@ interface CourseStat {
   count: number
 }
 
-/* ───── helpers ───── */
 function maxCount(stats: CourseStat[]): number {
   return Math.max(...stats.map((s) => s.count), 1)
 }
@@ -25,7 +24,6 @@ function pct(count: number, max: number) {
   return Math.round((count / max) * 100)
 }
 
-/* ───── sub-components ───── */
 function StatBar({
   stat,
   max,
@@ -40,15 +38,15 @@ function StatBar({
     <div className="flex items-center gap-3">
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline justify-between mb-1">
-          <span className="text-sm text-white font-medium truncate">{stat.course.name}</span>
+          <span className="text-sm text-ink font-medium truncate">{stat.course.name}</span>
           <span className="text-xs ml-2 flex-shrink-0" style={{ color: hex }}>
             {stat.count} โหวต
           </span>
         </div>
         {stat.course.code && (
-          <span className="text-[10px] font-mono text-gray-500">{stat.course.code}</span>
+          <span className="text-[10px] font-mono text-muted">{stat.course.code}</span>
         )}
-        <div className="mt-1.5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+        <div className="mt-1.5 h-1.5 rounded-full bg-surface-soft overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-700"
             style={{ width: `${p}%`, background: hex }}
@@ -73,32 +71,26 @@ function CategorySection({
 
   return (
     <div
-      className="rounded-2xl p-4 border"
-      style={{
-        background: `${rating.hex}08`,
-        borderColor: `${rating.hex}30`,
-      }}
+      className="rounded-md p-4 border border-hairline bg-canvas"
     >
-      {/* header */}
       <div className="flex items-center gap-2 mb-4">
         <span className="text-2xl">{rating.emoji}</span>
         <div>
-          <h3 className="text-white font-bold text-base leading-tight">{rating.label}</h3>
+          <h3 className="text-ink font-bold text-base leading-tight">{rating.label}</h3>
           <p className="text-xs" style={{ color: `${rating.hex}99` }}>
             {rating.desc}
           </p>
         </div>
         <div
           className="ml-auto text-xs px-2.5 py-1 rounded-full font-semibold"
-          style={{ background: `${rating.hex}20`, color: rating.hex }}
+          style={{ background: `${rating.hex}15`, color: rating.hex }}
         >
           {stats.reduce((a, s) => a + s.count, 0)} ทั้งหมด
         </div>
       </div>
 
-      {/* bars */}
       {top.length === 0 ? (
-        <p className="text-gray-600 text-sm text-center py-4">
+        <p className="text-muted text-sm text-center py-4">
           {filterYear ? `ยังไม่มีการโหวตจากปีที่ ${filterYear}` : 'ยังไม่มีการโหวต'}
         </p>
       ) : (
@@ -106,8 +98,8 @@ function CategorySection({
           {top.map((stat, i) => (
             <div key={stat.course.id} className="flex items-start gap-2">
               <span
-                className="text-xs font-black w-5 flex-shrink-0 mt-0.5"
-                style={{ color: i === 0 ? rating.hex : '#4b5563' }}
+                className="text-xs font-bold w-5 flex-shrink-0 mt-0.5"
+                style={{ color: i === 0 ? rating.hex : '#6a6a6a' }}
               >
                 #{i + 1}
               </span>
@@ -122,7 +114,6 @@ function CategorySection({
   )
 }
 
-/* ───── main page ───── */
 export default function DashboardPage() {
   const [filterYear, setFilterYear] = useState<number | null>(null)
   const [courses, setCourses] = useState<Course[]>([])
@@ -144,7 +135,6 @@ export default function DashboardPage() {
     fetchData()
   }, [fetchData])
 
-  /* build per-category top lists */
   const buildStats = (ratingLabel: Rating): CourseStat[] => {
     const filtered = filterYear ? votes.filter((v) => v.year === filterYear) : votes
     const countMap: Record<string, number> = {}
@@ -169,40 +159,33 @@ export default function DashboardPage() {
     : votes.length
 
   return (
-    <main className="min-h-screen pb-16">
-      {/* header */}
+    <main className="min-h-screen pb-16 bg-canvas">
       <div
-        className="sticky top-0 z-20 border-b"
-        style={{
-          background: 'rgba(10,10,20,0.92)',
-          backdropFilter: 'blur(12px)',
-          borderColor: 'rgba(255,255,255,0.08)',
-        }}
+        className="sticky top-0 z-20 border-b border-hairline bg-canvas"
       >
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-white font-bold text-base">📊 Dashboard</h1>
-            <p className="text-gray-500 text-xs mt-0.5">{totalVotes.toLocaleString()} โหวตทั้งหมด</p>
+            <h1 className="text-ink font-bold text-base">📊 Dashboard</h1>
+            <p className="text-muted text-xs mt-0.5">{totalVotes.toLocaleString()} โหวตทั้งหมด</p>
           </div>
           <div className="flex gap-3 items-center">
             <button
               onClick={fetchData}
-              className="text-gray-500 hover:text-white text-xs transition-colors"
+              className="text-muted hover:text-ink text-xs transition-colors"
               title="Refresh"
             >
               🔄
             </button>
-            <Link href="/" className="text-gray-400 hover:text-white text-xs transition-colors">
+            <Link href="/" className="text-muted hover:text-ink text-xs transition-colors">
               โหวต
             </Link>
-            <Link href="/admin" className="text-gray-400 hover:text-white text-xs transition-colors">
+            <Link href="/admin" className="text-muted hover:text-ink text-xs transition-colors">
               Admin
             </Link>
           </div>
         </div>
       </div>
 
-      {/* year filter */}
       <div className="max-w-3xl mx-auto px-4 pt-4 pb-2">
         <div className="flex gap-2 flex-wrap">
           <button
@@ -210,8 +193,8 @@ export default function DashboardPage() {
             className="px-4 py-1.5 rounded-full text-sm font-medium transition-all"
             style={
               filterYear === null
-                ? { background: '#6366f1', color: '#fff' }
-                : { background: 'rgba(255,255,255,0.06)', color: '#9ca3af' }
+                ? { background: '#ff385c', color: '#ffffff' }
+                : { background: '#f7f7f7', color: '#6a6a6a' }
             }
           >
             ภาพรวม
@@ -225,15 +208,15 @@ export default function DashboardPage() {
                 className="px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5"
                 style={
                   filterYear === y
-                    ? { background: '#6366f1', color: '#fff' }
-                    : { background: 'rgba(255,255,255,0.06)', color: '#9ca3af' }
+                    ? { background: '#ff385c', color: '#ffffff' }
+                    : { background: '#f7f7f7', color: '#6a6a6a' }
                 }
               >
                 ปีที่ {y}
                 <span
                   className="text-[10px] px-1.5 py-0.5 rounded-full"
                   style={{
-                    background: filterYear === y ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)',
+                    background: filterYear === y ? 'rgba(255,255,255,0.25)' : '#ebebeb',
                   }}
                 >
                   {cnt}
@@ -244,10 +227,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* content */}
       <div className="max-w-3xl mx-auto px-4 mt-4">
         {loading ? (
-          <div className="text-center py-20 text-gray-500 text-sm">⏳ กำลังโหลด...</div>
+          <div className="text-center py-20 text-muted text-sm">⏳ กำลังโหลด...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {RATINGS.map((r) => (

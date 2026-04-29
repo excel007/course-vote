@@ -8,22 +8,21 @@
 }
 
 :root {
-  --bg: #0a0a14;
-  --card: #13131f;
-  --border: rgba(255,255,255,0.08);
-  --text-muted: #6b7280;
+  --bg: #ffffff;
+  --card: #ffffff;
+  --border: #dddddd;
+  --text-muted: #6a6a6a;
 }
 
 body {
   background-color: var(--bg);
-  color: white;
-  font-family: 'Sarabun', 'Noto Sans Thai', system-ui, sans-serif;
+  color: #222222;
+  font-family: 'Airbnb Cereal VF', Circular, -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 9999px; }
+::-webkit-scrollbar-thumb { background: #dddddd; border-radius: 9999px; }
 
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(16px); }
@@ -45,11 +44,13 @@ body {
 .course-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 16px;
-  transition: border-color 0.2s;
+  transition: box-shadow 0.2s;
 }
-.course-card:hover { border-color: rgba(255,255,255,0.15); }
+.course-card:hover {
+  box-shadow: rgba(0,0,0,0.02) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.1) 0 4px 8px;
+}
 
 .rating-btn {
   display: flex;
@@ -57,20 +58,20 @@ body {
   align-items: center;
   gap: 4px;
   padding: 8px 4px;
-  border-radius: 12px;
-  border: 1.5px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border: 1.5px solid #ebebeb;
+  background: #ffffff;
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: inherit;
   flex: 1;
 }
 .rating-btn:hover {
-  background: rgba(255,255,255,0.08);
+  background: #f7f7f7;
   transform: translateY(-2px);
 }
 .rating-btn:active { transform: scale(0.94); }
 .rating-btn.voted {
   border-color: currentColor;
-  background: rgba(255,255,255,0.1);
+  background: #f7f7f7;
 }
